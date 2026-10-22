@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#101411">
+  <title>RUMBO — Orientación de campo</title>
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+  <div class="app">
+    <header class="topbar">
+      <div class="brand">
+        <div class="brand-mark" aria-hidden="true">⌖</div>
+        <div>
+          <div class="brand-name">RUMBO</div>
+          <div class="brand-subtitle">ORIENTACIÓN DE CAMPO</div>
+        </div>
+      </div>
+      <div class="top-status">
+        <span id="statusLight" class="status-light" aria-hidden="true"></span>
+        <span id="statusText">INICIANDO SISTEMA</span>
+        <span id="coordinateReadout" class="top-coords"></span>
+      </div>
+    </header>
+
+    <main class="layout">
+      <aside class="sidebar">
+        <section class="card briefing">
+          <div class="eyebrow">Ejercicio de navegación · 01</div>
+          <h1>Ubica tu posición.</h1>
+          <p class="brief-copy">Reconoce el terreno en <strong>Street View</strong>. Usa el rumbo de la brújula y las referencias del paisaje para triangular tu posición en el mapa.</p>
+          <div class="briefing-meta">
+            <div class="meta-item">
+              <div class="meta-label">Rumbo de vista</div>
+              <div class="meta-value"><span id="headingReadout">000°</span> <em id="cardinalReadout">N</em></div>
+            </div>
+            <div class="meta-item">
+              <div class="meta-label">Puntaje máximo</div>
+              <div class="meta-value">5 000 <em>pts</em></div>
+            </div>
+          </div>
+        </section>
+
+        <section class="card round-card">
+          <div class="section-heading">
+            <span class="section-title">Objetivo activo</span>
+            <span id="roundId" class="round-id">RONDA 01</span>
+          </div>
+          <div id="roundName" class="round-name">Preparando coordenadas…</div>
+          <div class="round-sub">Identifica el punto exacto antes de confirmar.</div>
+        </section>
+
+        <section class="card instructions">
+          <div class="section-title">Protocolo</div>
+          <div class="steps">
+            <div class="step"><span class="step-number">01</span><span>Explora el entorno y desplázate por las calles en la vista 360°.</span></div>
+            <div class="step"><span class="step-number">02</span><span>Gira la vista: la brújula abierta sigue el azimut en tiempo real.</span></div>
+            <div class="step"><span class="step-number">03</span><span>Abre el mapa, traza líneas de orientación y marca tu estimación.</span></div>
+            <div class="step"><span class="step-number">04</span><span>Confirma una sola flecha para calcular distancia y puntuación.</span></div>
+          </div>
+        </section>
+
+        <button id="openMapButton" class="map-launch" type="button" disabled>
+          <span class="map-launch-copy">
+            <span class="map-launch-title">Abrir mapa táctico</span>
+            <span class="map-launch-sub">Vista satelital · marca y triangula</span>
+          </span>
+          <span class="launch-arrow" aria-hidden="true">↗</span>
+        </button>
+
+        <section id="resultCard" class="card result-card" aria-live="polite">
+          <div class="section-title">Resultado del ejercicio</div>
+          <div class="result-score"><span id="scoreReadout">0</span> <span>/ 5 000 pts</span></div>
+          <div id="distanceReadout" class="result-distance"></div>
+          <div id="resultNote" class="result-note"></div>
+          <button id="nextRoundButton" class="secondary-button" type="button">Siguiente ronda ↗</button>
+        </section>
+      </aside>
+
+      <section class="scene" aria-label="Vista panorámica de la ubicación">
+        <div id="pano"></div>
+        <div class="scene-vignette" aria-hidden="true"></div>
+        <div class="scene-topline">
+          <span class="scene-tag">Vista panorámica · 360°</span>
+          <span class="scene-tag">Modo exploración</span>
+        </div>
+        <div id="compass" class="compass" aria-label="Brújula lensática, arrastrar para mover">
+          <div class="compass-topline"><span>BRÚJULA LENSÁTICA</span><span>OPEN · 180°</span></div>
+          <div class="compass-hinge" aria-hidden="true"></div>
+          <div class="compass-halves">
+            <div class="compass-face lens-face" aria-label="Visor transparente">
+              <span class="lens-caption">VISOR · ALINEA EL AZIMUT</span>
+              <span class="lens-window" aria-hidden="true"></span>
+              <div class="sight-line" aria-hidden="true"></div>
+            </div>
+            <div class="compass-face dial-face" aria-label="Rosa de la brújula">
+              <div class="compass-rose">
+                <span class="rose-mark north">N</span><span class="rose-mark east">E</span>
+                <span class="rose-mark south">S</span><span class="rose-mark west">W</span>
+                <span class="rose-needle"></span><span class="rose-center"></span>
+              </div>
+            </div>
+          </div>
+          <div class="compass-bottomline"><strong id="compassHeading">000°</strong><span id="compassCardinal">N</span><span class="compass-click-note">ARRASTRAR</span></div>
+        </div>
+        <div class="scene-bottomline">
+          <span id="sceneCoordinates" class="scene-coordinates">COORDENADAS OCULTAS</span>
+          <span class="scene-hint">Arrastra para mirar · usa las flechas para avanzar</span>
+        </div>
+        <div id="sceneLoader" class="scene-loader" role="status">
+          <div class="loader-content">
+            <div class="loader-icon" aria-hidden="true">⌖</div>
+            <div id="loaderTitle" class="loader-title">Estableciendo conexión</div>
+            <div id="loaderCopy" class="loader-copy">Cargando coordenadas de la misión y preparando Street View.</div>
+            <div class="loading-bar" aria-hidden="true"></div>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <section id="mapOverlay" class="map-overlay" aria-label="Mapa táctico">
+    <div class="map-panel">
+      <div class="map-toolbar">
+        <div class="map-title-wrap">
+          <div class="eyebrow">Navegación de campo</div>
+          <div class="map-title">Mapa táctico satelital</div>
+        </div>
+        <div class="map-actions">
+          <button id="guessToolButton" class="tool-button active" type="button" aria-pressed="true">⌖ Marcar posición</button>
+          <button id="lineToolButton" class="tool-button" type="button" aria-pressed="false">╱ Trazar línea</button>
+          <button id="clearLinesButton" class="tool-button" type="button">Borrar líneas</button>
+          <button id="confirmButton" class="tool-button confirm" type="button" disabled>Confirmar flecha</button>
+          <button id="closeMapButton" class="close-map" type="button" aria-label="Cerrar mapa">×</button>
+        </div>
+      </div>
+      <div class="map-status">
+        <span id="mapInstruction"><strong>Marcar posición:</strong> selecciona un punto del mapa o arrastra la flecha para ajustar.</span>
+        <span id="lineStatus">RUMBO DE VISTA <strong>000° N</strong></span>
+      </div>
+      <div id="map" role="application" aria-label="Mapa satelital interactivo"></div>
+    </div>
+  </section>
+
+  <script src="./game.js" defer></script>
+
+</body>
+</html>
